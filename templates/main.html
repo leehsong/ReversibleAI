@@ -1,0 +1,50 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="card centered-text">
+    <h2>{{ _('환영합니다,') }} {{ username }}님!</h2>
+    <p>{{ _('원하는 기능을 선택해주세요.') }}</p>
+</div>
+
+<div class="menu-grid">
+    <div class="menu-card">
+        <div class="menu-icon">🗺️</div>
+        <h3 class="menu-title">{{ _('지형 선택') }}</h3>
+        <p class="menu-description">{{ _('시뮬레이션 지형 생성') }}</p>
+        <div class="menu-action">
+            <a href="{{ url_for('terrain_selection') }}">{{ _('바로가기') }}</a>
+        </div>
+    </div>
+
+    <div class="menu-card">
+        <div class="menu-icon">☣️</div>
+        <h3 class="menu-title">{{ _('오염원 배치') }}</h3>
+        <p class="menu-description">{{ _('지도에 오염원 추가') }}</p>
+        <div class="menu-action">
+            <a href="{{ url_for('contaminant_placement') }}">{{ _('바로가기') }}</a>
+        </div>
+    </div>
+
+    <div class="menu-card">
+        <div class="menu-icon">🚁</div>
+        <h3 class="menu-title">{{ _('드론 시뮬레이션') }}</h3>
+        <p class="menu-description">{{ _('측정 데이터 확보') }}</p>
+        <div class="menu-action">
+            <a href="{{ url_for('drone_simulation') }}">{{ _('바로가기') }}</a>
+        </div>
+    </div>
+
+    <div class="menu-card">
+        <div class="menu-icon">🧠</div>
+        <h3 class="menu-title">{{ _('AI 예측') }}</h3>
+        <p class="menu-description">{{ _('오염 분포도 예측') }}</p>
+        <div class="menu-action">
+            <a href="{{ url_for('ai_model') }}">{{ _('바로가기') }}</a>
+        </div>
+    </div>
+</div>
+
+<div class="centered-text" style="margin-top: 30px;">
+    <a href="{{ url_for('logout') }}" class="button-secondary">{{ _('사용자 변경') }}</a>
+</div>
+{% endblock %}

@@ -1,0 +1,297 @@
+# English translations for the Drone Simulator project.
+# Copyright (C) 2025 leehsong
+# This file is distributed under the same license as the project.
+# leehsong <leehsong@example.com>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Drone Simulator 1.0\n"
+"Report-Msgid-Bugs-To: leehsong@example.com\n"
+"POT-Creation-Date: 2025-10-18 20:20+0900\n"
+"PO-Revision-Date: 2025-10-18 20:25+0900\n"
+"Last-Translator: leehsong <leehsong@example.com>\n"
+"Language: en\n"
+"Language-Team: English <en@example.com>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: app.py:125
+#, python-format
+msgid "%(filename)s 파일을 찾을 수 없습니다."
+msgstr "File %(filename)s not found."
+
+#: app.py:137
+msgid "지형 데이터가 없습니다. 먼저 지형을 생성하세요."
+msgstr "No terrain data found. Please generate the terrain first."
+
+#: app.py:161
+msgid "클릭 좌표가 범위를 벗어났습니다."
+msgstr "Clicked coordinates are out of bounds."
+
+#: app.py:185
+msgid "예측에 사용할 드론 데이터가 없습니다. 3단계 시뮬레이션을 먼저 실행하세요."
+msgstr "No drone data available for prediction. Please run the simulation in Step 3 first."
+
+#: templates/index.html:4
+msgid "시뮬레이터 시작하기"
+msgstr "Start Simulator"
+
+#: templates/index.html:5
+msgid "사용자의 이름을 입력하고 시작하세요."
+msgstr "Enter your name to begin."
+
+#: templates/index.html:5
+msgid "입력된 이름은 브라우저 세션 동안 데이터와 함께 저장됩니다."
+msgstr "The entered name will be saved with your data during the browser session."
+
+#: templates/index.html:7
+msgid "사용자 이름:"
+msgstr "User Name:"
+
+#: templates/index.html:8
+msgid "예: 홍길동"
+msgstr "e.g., John Doe"
+
+#: templates/index.html:9
+msgid "시작하기"
+msgstr "Start"
+
+#: templates/layout.html:6 templates/layout.html:14
+msgid "드론 방사능 오염 예측 시뮬레이터"
+msgstr "Drone Radiation Contamination Prediction Simulator"
+
+#: templates/layout.html:22
+msgid "사용자:"
+msgstr "User:"
+
+#: templates/layout.html:23
+msgid "로그아웃"
+msgstr "Logout"
+
+#: templates/layout.html:29
+msgid "메인 메뉴"
+msgstr "Main Menu"
+
+#: templates/layout.html:30 templates/main.html:12
+#: templates/part1_terrain.html:5
+msgid "지형 선택"
+msgstr "Terrain Selection"
+
+#: templates/layout.html:31 templates/main.html:21
+#: templates/part2_contaminant.html:5
+msgid "오염원 배치"
+msgstr "Contaminant Placement"
+
+#: templates/layout.html:32 templates/main.html:30
+#: templates/part3_simulation.html:5
+msgid "드론 시뮬레이션"
+msgstr "Drone Simulation"
+
+#: templates/layout.html:33 templates/main.html:39
+#: templates/part4_training.html:5
+msgid "AI 예측"
+msgstr "AI Prediction"
+
+#: templates/main.html:5
+msgid "환영합니다,"
+msgstr "Welcome,"
+
+#: templates/main.html:6
+msgid "원하는 기능을 선택해주세요."
+msgstr "Please select a function you want."
+
+#: templates/main.html:13
+msgid "시뮬레이션 지형 생성"
+msgstr "Generate simulation terrain"
+
+#: templates/main.html:15 templates/main.html:24 templates/main.html:33
+#: templates/main.html:42
+msgid "바로가기"
+msgstr "Go"
+
+#: templates/main.html:22
+msgid "지도에 오염원 추가"
+msgstr "Add contaminant to the map"
+
+#: templates/main.html:31
+msgid "측정 데이터 확보"
+msgstr "Acquire measurement data"
+
+#: templates/main.html:40
+msgid "오염 분포도 예측"
+msgstr "Predict contamination map"
+
+#: templates/main.html:48
+msgid "사용자 변경"
+msgstr "Change User"
+
+#: templates/part1_terrain.html:6
+msgid "시뮬레이션의 기반이 될 3D 지형의 크기와 종류를 선택하고 '생성하기' 버튼을 누르세요."
+msgstr "Select the size and type of the 3D terrain for the simulation and press the 'Generate' button."
+
+#: templates/part1_terrain.html:6
+msgid "새로운 지형을 생성하면 이전 오염 데이터는 초기화됩니다."
+msgstr "Generating a new terrain will reset any previous contamination data."
+
+#: templates/part1_terrain.html:9
+msgid "가로 크기 (X):"
+msgstr "Width (X):"
+
+#: templates/part1_terrain.html:13
+msgid "세로 크기 (Y):"
+msgstr "Height (Y):"
+
+#: templates/part1_terrain.html:17
+msgid "지형 종류:"
+msgstr "Terrain Type:"
+
+#: templates/part1_terrain.html:19 templates/part4_training.html:16
+msgid "평지 (Flat)"
+msgstr "Flat"
+
+#: templates/part1_terrain.html:20 templates/part4_training.html:17
+msgid "언덕 (Hill)"
+msgstr "Hill"
+
+#: templates/part1_terrain.html:21 templates/part4_training.html:18
+msgid "웅덩이 (Puddle)"
+msgstr "Puddle"
+
+#: templates/part1_terrain.html:22
+msgid "DEM 데이터 1"
+msgstr "DEM Data 1"
+
+#: templates/part1_terrain.html:23
+msgid "DEM 데이터 2"
+msgstr "DEM Data 2"
+
+#: templates/part1_terrain.html:26
+msgid "지형 생성하기"
+msgstr "Generate Terrain"
+
+#: templates/part1_terrain.html:32
+msgid "지형을 생성 중입니다..."
+msgstr "Generating terrain..."
+
+#: templates/part2_contaminant.html:7
+msgid "아래 <strong>3D 지형 지도</strong> 위 원하는 위치를 <strong>클릭</strong>하여 오염원을 추가하세요."
+msgstr "Add a contaminant source by <strong>clicking</strong> on the desired location on the <strong>3D terrain map</strong> below."
+
+#: templates/part2_contaminant.html:8
+msgid "클릭하면 해당 위치의 지형 색상이 실시간으로 붉게 변합니다."
+msgstr "When you click, the color of the terrain at that location will turn red in real-time."
+
+#: templates/part2_contaminant.html:23
+msgid "3D 지도 위를 클릭하여 오염원 추가"
+msgstr "Click on the 3D map to add a contaminant source"
+
+#: templates/part2_contaminant.html:24
+msgid "오염도"
+msgstr "Contamination Level"
+
+#: templates/part3_simulation.html:6
+msgid "'시뮬레이션 시작' 버튼을 눌러 드론 스캔을 시작하세요."
+msgstr "Press the 'Start Simulation' button to begin the drone scan."
+
+#: templates/part3_simulation.html:6
+msgid "드론의 비행 경로와 측정된 방사능 값이 3D 지형 위에 불연속적인 점으로 표시됩니다."
+msgstr "The drone's flight path and measured radiation values will be displayed as discrete points over the 3D terrain."
+
+#: templates/part3_simulation.html:9
+msgid "드론 고도:"
+msgstr "Drone Altitude:"
+
+#: templates/part3_simulation.html:12
+msgid "시뮬레이션 시작"
+msgstr "Start Simulation"
+
+#: templates/part3_simulation.html:18
+msgid "시뮬레이션을 실행 중입니다. 잠시만 기다려주세요..."
+msgstr "Running simulation. Please wait..."
+
+#: templates/part3_simulation.html:30
+msgid "드론 시뮬레이션 준비"
+msgstr "Preparing Drone Simulation"
+
+#: templates/part3_simulation.html:31
+msgid "측정된 오염 수치"
+msgstr "Measured Contamination Value"
+
+#: templates/part3_simulation.html:32
+msgid "드론 측정값"
+msgstr "Drone Measurements"
+
+#: templates/part4_training.html:6
+msgid "AI 모델은 희소한 드론 측정 데이터를 기반으로 전체 지역의 오염 분포를 예측합니다."
+msgstr "The AI model predicts the overall contamination distribution based on sparse drone measurement data."
+
+#: templates/part4_training.html:10
+msgid "모델 학습 (선택사항)"
+msgstr "Model Training (Optional)"
+
+#: templates/part4_training.html:11
+msgid "특정 지형에 대한 예측 모델을 생성하거나 업데이트합니다. 이 작업은 컴퓨터 사양에 따라 수 분에서 수십 분 이상 소요될 수 있습니다."
+msgstr "Create or update a prediction model for a specific terrain. This process may take several minutes depending on your computer's specifications."
+
+#: templates/part4_training.html:14
+msgid "학습할 지형:"
+msgstr "Terrain to Train:"
+
+#: templates/part4_training.html:22
+msgid "생성할 샘플 수:"
+msgstr "Number of Samples to Generate:"
+
+#: templates/part4_training.html:26
+msgid "학습 Epochs:"
+msgstr "Training Epochs:"
+
+#: templates/part4_training.html:29
+msgid "모델 학습 시작"
+msgstr "Start Model Training"
+
+#: templates/part4_training.html:35
+msgid "오염 분포 예측"
+msgstr "Contamination Distribution Prediction"
+
+#: templates/part4_training.html:36
+msgid "3단계에서 측정한 드론 데이터를 사용하여 현재 지형의 오염 분포를 예측합니다."
+msgstr "Predict the current terrain's contamination distribution using the drone data measured in Step 3."
+
+#: templates/part4_training.html:36
+msgid "예측을 위해서는 3단계 시뮬레이션이 먼저 완료되어야 합니다."
+msgstr "The simulation in Step 3 must be completed before running a prediction."
+
+#: templates/part4_training.html:37
+msgid "예측 실행"
+msgstr "Run Prediction"
+
+#: templates/part4_training.html:42
+msgid "실제 오염 분포 (Ground Truth)"
+msgstr "Actual Contamination (Ground Truth)"
+
+#: templates/part4_training.html:46
+msgid "AI 예측 결과 (Prediction)"
+msgstr "AI Prediction Result"
+
+#: templates/part4_training.html:53
+msgid "⏳ 모델 학습을 시작합니다. 이 작업은 매우 오래 걸릴 수 있습니다..."
+msgstr "⏳ Starting model training. This may take a long time..."
+
+#: templates/part4_training.html:54
+msgid "학습 완료!"
+msgstr "Training Complete!"
+
+#: templates/part4_training.html:55
+msgid "예측 중..."
+msgstr "Predicting..."
+
+#: templates/part4_training.html:56
+msgid "실제 오염 분포"
+msgstr "Actual Contamination Distribution"
+
+#: templates/part4_training.html:57
+msgid "AI 예측 결과"
+msgstr "AI Prediction Result"

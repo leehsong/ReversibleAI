@@ -1,0 +1,9 @@
+# requirements.txt
+Flask
+Flask-Session
+Flask-Babel
+numpy
+pandas
+scipy
+tensorflow
+gunicorn

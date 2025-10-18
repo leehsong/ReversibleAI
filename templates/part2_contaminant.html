@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="card">
+    <h2>2. {{ _('오염원 배치') }}</h2>
+    <p>
+        {{ _('아래 <strong>3D 지형 지도</strong> 위 원하는 위치를 <strong>클릭</strong>하여 오염원을 추가하세요.') }}<br>
+        {{ _('클릭하면 해당 위치의 지형 색상이 실시간으로 붉게 변합니다.') }}
+    </p>
+</div>
+
+<div class="card plot-container">
+    <div id="unified-plot" style="cursor: pointer;">
+        </div>
+</div>
+
+<script>
+    const initialTerrainData = {{ terrain_data_json | safe }};
+    const initialContaminationData = {{ contamination_data_json | safe }};
+
+    // Pass translated text to JavaScript
+    const i18n = {
+        plotTitle: "{{ _('3D 지도 위를 클릭하여 오염원 추가') }}",
+        colorbarTitle: "{{ _('오염도') }}"
+    };
+</script>
+{% endblock %}

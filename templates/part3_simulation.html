@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="card">
+    <h2>3. {{ _('드론 시뮬레이션') }}</h2>
+    <p>{{ _("'시뮬레이션 시작' 버튼을 눌러 드론 스캔을 시작하세요.") }}<br>{{ _('지표면의 실제 오염도는 붉은색으로, 드론이 측정한 값은 공중의 점으로 표시됩니다.') }}</p>
+    <div class="controls">
+        <div class="control-group">
+            <label for="altitude">{{ _('드론 고도:') }}</label>
+            <input type="number" id="altitude" value="30" min="10" max="100">
+        </div>
+        <button id="run-simulation-btn">{{ _('시뮬레이션 시작') }}</button>
+    </div>
+</div>
+
+<div class="card plot-container">
+    <div id="loading-indicator-sim" style="display: none; text-align: center; padding: 50px;">
+        <p>{{ _('시뮬레이션을 실행 중입니다. 잠시만 기다려주세요...') }}</p>
+    </div>
+    <div id="simulation-plot">
+        </div>
+</div>
+
+<script>
+    const initialTerrainDataSim = {{ terrain_data_json | safe }};
+    const initialContaminationDataSim = {{ contamination_data_json | safe }};
+
+    // Pass translated text to JavaScript
+    // This object provides all necessary text for the main.js file.
+    const i18n_sim = {
+        plotTitle: "{{ _('드론 시뮬레이션 준비') }}",
+        groundTruthColorbarTitle: "{{ _('오염도') }}",
+        droneColorbarTitle: "{{ _('측정된 오염 수치') }}",
+        traceName: "{{ _('드론 측정값') }}"
+    };
+</script>
+{% endblock %}

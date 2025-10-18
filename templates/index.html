@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="card centered-text">
+    <h2>{{ _('시뮬레이터 시작하기') }}</h2>
+    <p>{{ _('사용자의 이름을 입력하고 시작하세요.') }}<br>{{ _('입력된 이름은 브라우저 세션 동안 데이터와 함께 저장됩니다.') }}</p>
+    <form method="post" class="form-group">
+        <label for="username">{{ _('사용자 이름:') }}</label>
+        <input type="text" id="username" name="username" required placeholder="{{ _('예: 홍길동') }}">
+        <button type="submit">{{ _('시작하기') }}</button>
+    </form>
+</div>
+{% endblock %}

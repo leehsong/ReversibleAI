@@ -1,0 +1,60 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="card">
+    <h2>4. {{ _('AI 예측') }}</h2>
+    <p>{{ _('AI 모델은 희소한 드론 측정 데이터를 기반으로 전체 지역의 오염 분포를 예측합니다.') }}</p>
+</div>
+
+<div class="card">
+    <h3>Part A: {{ _('모델 학습 (선택사항)') }}</h3>
+    <p>{{ _('특정 지형에 대한 예측 모델을 생성하거나 업데이트합니다. 이 작업은 컴퓨터 사양에 따라 수 분에서 수십 분 이상 소요될 수 있습니다.') }}</p>
+    <div class="controls">
+        <div class="control-group">
+            <label for="train-terrain-type">{{ _('학습할 지형:') }}</label>
+            <select id="train-terrain-type">
+                <option value="flat">{{ _('평지 (Flat)') }}</option>
+                <option value="hill">{{ _('언덕 (Hill)') }}</option>
+                <option value="puddle">{{ _('웅덩이 (Puddle)') }}</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label for="num-samples">{{ _('생성할 샘플 수:') }}</label>
+            <input type="number" id="num-samples" value="100" min="10" max="1000" step="10">
+        </div>
+        <div class="control-group">
+            <label for="epochs">{{ _('학습 Epochs:') }}</label>
+            <input type="number" id="epochs" value="20" min="5" max="100">
+        </div>
+        <button id="start-training-btn">{{ _('모델 학습 시작') }}</button>
+    </div>
+    <div id="training-status" style="margin-top: 15px;"></div>
+</div>
+
+<div class="card">
+    <h3>Part B: {{ _('오염 분포 예측') }}</h3>
+    <p>{{ _("3단계에서 측정한 드론 데이터를 사용하여 현재 지형의 오염 분포를 예측합니다.") }}<br>{{ _('예측을 위해서는 3단계 시뮬레이션이 먼저 완료되어야 합니다.') }}</p>
+    <button id="predict-btn">{{ _('예측 실행') }}</button>
+</div>
+
+<div class="prediction-results">
+    <div class="card plot-container half-width">
+        <h4>{{ _('실제 오염 분포 (Ground Truth)') }}</h4>
+        <div id="ground-truth-plot"></div>
+    </div>
+    <div class="card plot-container half-width">
+        <h4>{{ _('AI 예측 결과 (Prediction)') }}</h4>
+        <div id="prediction-plot"></div>
+    </div>
+</div>
+
+<script>
+    const i18n_ai = {
+        trainingStart: "{{ _('⏳ 모델 학습을 시작합니다. 이 작업은 매우 오래 걸릴 수 있습니다...') }}",
+        trainingComplete: "<strong>✅ {{ _('학습 완료!') }}</strong><br>Final loss:",
+        predicting: "{{ _('예측 중...') }}",
+        groundTruthTitle: "{{ _('실제 오염 분포') }}",
+        predictionTitle: "{{ _('AI 예측 결과') }}"
+    };
+</script>
+{% endblock %}

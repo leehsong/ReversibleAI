@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="{{ g.lang_code }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ _('드론 방사능 오염 예측 시뮬레이터') }}</title>
+    <script src="https://cdn.plot.ly/plotly-2.32.0.min.js" charset="utf-8"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1>☢️ {{ _('드론 방사능 오염 예측 시뮬레이터') }}</h1>
+                <div class="controls-right">
+                    <div class="language-selector">
+                        <a href="{{ url_for(request.endpoint, lang_code='ko') }}">🇰🇷 Korean</a> | 
+                        <a href="{{ url_for(request.endpoint, lang_code='en') }}">🇬🇧 English</a>
+                    </div>
+                    {% if session.username %}
+                        <div class="user-info">
+                            <span><strong>{{ _('사용자:') }}</strong> {{ session.username }}</span>
+                            <a href="{{ url_for('logout') }}" class="logout-button">{{ _('로그아웃') }}</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            <nav>
+                <a href="{{ url_for('main_menu') }}">{{ _('메인 메뉴') }}</a>
+                <a href="{{ url_for('terrain_selection') }}">1. {{ _('지형 선택') }}</a>
+                <a href="{{ url_for('contaminant_placement') }}">2. {{ _('오염원 배치') }}</a>
+                <a href="{{ url_for('drone_simulation') }}">3. {{ _('드론 시뮬레이션') }}</a>
+                <a href="{{ url_for('ai_model') }}">4. {{ _('AI 예측') }}</a>
+            </nav>
+        </header>
+        <main>{% block content %}{% endblock %}</main>
+        <footer><p>AI Hub for Radiation Mapping Project</p></footer>
+    </div>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
