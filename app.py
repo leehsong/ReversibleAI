@@ -127,6 +127,7 @@ def generate_terrain_api():
         z_data = terrain_generator.create_terrain(x_size, y_size, terrain_type)
 
     session['terrain_data'] = z_data.tolist()
+    session['terrain_type'] = terrain_type
     session.pop('contamination_data', None)
     session.pop('drone_measurements', None)
     return jsonify({'z_data': z_data.tolist()})
@@ -160,6 +161,41 @@ def place_contaminant_api():
     else:
         return jsonify({'error': _('클릭 좌표가 범위를 벗어났습니다.')}), 400
 
+
+@app.route('/api/random_contaminants', methods=['POST'])
+def random_contaminants_api():
+    if 'terrain_data' not in session:
+        return jsonify({'error': _('지형 데이터가 없습니다. 먼저 지형을 생성하세요.')}), 400
+
+    terrain = np.array(session.get('terrain_data'))
+    contamination = np.zeros_like(terrain, dtype=float)
+
+    payload = request.json or {}
+    min_count = int(payload.get('min_count', 1))
+    max_count = int(payload.get('max_count', 20))
+    if min_count < 1:
+        min_count = 1
+    if max_count < min_count:
+        max_count = min_count
+
+    rng = np.random.default_rng()
+    count = int(payload.get('count', rng.integers(min_count, max_count + 1)))
+
+    strength_min, strength_max = float(payload.get('strength_min', 50)), float(payload.get('strength_max', 200))
+    sigma_min, sigma_max = float(payload.get('sigma_min', 3)), float(payload.get('sigma_max', 8))
+
+    height, width = terrain.shape
+    for _ in range(count):
+        y = int(rng.integers(0, height))
+        x = int(rng.integers(0, width))
+        strength = float(payload.get('strength')) if 'strength' in payload else float(rng.uniform(strength_min, strength_max))
+        sigma = float(payload.get('sigma')) if 'sigma' in payload else float(rng.uniform(sigma_min, sigma_max))
+        contamination = simulation.add_gaussian_source(contamination, (y, x), strength=strength, sigma=sigma)
+
+    session['contamination_data'] = contamination.tolist()
+    session.modified = True
+    return jsonify({'contamination_data': contamination.tolist()})
+
 @app.route('/api/run_simulation', methods=['POST'])
 def run_simulation_api():
     altitude = float(request.json.get('altitude', 30))
@@ -173,21 +209,40 @@ def run_simulation_api():
 @app.route('/api/start_training', methods=['POST'])
 def start_training_api():
     config = request.json
-    history = model.train_model_on_terrain(
+    history, was_fine_tuned = model.train_model_on_terrain(
         terrain_type=config['terrain_type'],
         num_samples=int(config['num_samples']),
-        epochs=int(config['epochs']))
-    return jsonify({"status": "Training Complete", "loss": history.history['loss']})
+        epochs=int(config['epochs']),
+        reuse_existing=bool(config.get('reuse_existing', True)))
+    return jsonify({
+        "status": "Training Complete",
+        "loss": history.history['loss'],
+        "mode": "fine_tuned" if was_fine_tuned else "fresh"
+    })
 
 @app.route('/api/predict_contamination', methods=['GET'])
 def predict_contamination_api():
     if 'drone_measurements' not in session:
         return jsonify({"error": _('예측에 사용할 드론 데이터가 없습니다. 3단계 시뮬레이션을 먼저 실행하세요.')}), 400
     measurements = session.get('drone_measurements')
-    terrain_shape = np.array(session.get('terrain_data')).shape
+    terrain_data = session.get('terrain_data')
+    terrain_shape = np.array(terrain_data).shape
+    ground_truth = session.get('contamination_data')
+    ground_truth_array = np.array(ground_truth) if ground_truth is not None else None
+    target_scale = float(np.max(ground_truth_array)) if ground_truth_array is not None else None
+    terrain_type = session.get('terrain_type', 'flat')
     input_data = simulation.format_measurements_for_model(measurements, terrain_shape)
-    predicted_map = model.predict_with_model(input_data, terrain_type='flat')
-    return jsonify({'ground_truth': session.get('contamination_data'), 'prediction': predicted_map.tolist()})
+    try:
+        predicted_map = model.predict_with_model(input_data, terrain_type=terrain_type)
+    except Exception as exc:
+        return jsonify({"error": _('AI 예측 중 오류가 발생했습니다: %(message)s', message=str(exc))}), 500
+    idw_map = simulation.idw_interpolation(measurements, terrain_shape, target_scale=target_scale)
+    return jsonify({
+        'ground_truth': ground_truth,
+        'prediction': predicted_map.tolist(),
+        'idw_prediction': idw_map.tolist(),
+        'terrain_type': terrain_type
+    })
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host="0.0.0.0",debug=True, port=30000)

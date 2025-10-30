@@ -1,9 +1,28 @@
-# requirements.txt
-Flask
+# --- Web Framework ---
+Flask>=3.0
 Flask-Session
-Flask-Babel
+flask-cors
+flask-sqlalchemy
+gunicorn
+python-dotenv>=1.0
+
+# --- i18n (다국어) ---
+Flask-Babel>=4.0.0
+
+# --- Data & AI ---
 numpy
 pandas
-scipy
-tensorflow
-gunicorn
+scikit-learn
+torch
+torchvision
+tqdm
+
+# --- Image Processing ---
+opencv-python-headless
+pillow
+matplotlib
+scikit-image
+
+# --- Networking & Parsing ---
+requests>=2.31.0
+beautifulsoup4

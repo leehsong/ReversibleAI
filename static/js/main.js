@@ -49,6 +49,7 @@ function setupTerrainPage() {
 // --- Part 2: 오염원 배치 페이지 로직 ---
 function initContaminationPage() {
     const plotDiv = document.getElementById('unified-plot');
+    const randomBtn = document.getElementById('random-contaminants-btn');
 
     const plotData = [{
         z: initialTerrainData,
@@ -71,6 +72,35 @@ function initContaminationPage() {
     };
 
     Plotly.newPlot(plotDiv, plotData, layout);
+
+    if (randomBtn) {
+        randomBtn.addEventListener('click', () => {
+            fetch('/api/random_contaminants', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({})
+            })
+            .then(response => response.json())
+            .then(apiResponse => {
+                if (apiResponse.error) {
+                    alert(apiResponse.error);
+                    return;
+                }
+
+                const updatedContamination = apiResponse.contamination_data;
+                const newMax = Math.max(10, ...updatedContamination.flat());
+
+                const newData = {
+                    ...plotData[0],
+                    surfacecolor: updatedContamination,
+                    cmax: newMax
+                };
+
+                Plotly.react(plotDiv, [newData], layout);
+            })
+            .catch(() => alert(i18n.randomError || 'Error generating random contaminants.'));
+        });
+    }
 
     plotDiv.on('plotly_click', function(data) {
         if (data.points.length > 0) {
@@ -212,7 +242,8 @@ function setupAiPage() {
         const payload = {
             terrain_type: document.getElementById('train-terrain-type').value,
             num_samples: document.getElementById('num-samples').value,
-            epochs: document.getElementById('epochs').value
+            epochs: document.getElementById('epochs').value,
+            reuse_existing: document.getElementById('reuse-existing').checked
         };
 
         fetch('/api/start_training', {
@@ -222,30 +253,120 @@ function setupAiPage() {
         })
         .then(response => response.json())
         .then(data => {
-            statusDiv.innerHTML = `${i18n_ai.trainingComplete} ${data.loss[data.loss.length - 1]}`;
+            const lastLoss = data.loss?.[data.loss.length - 1] ?? 'N/A';
+            const modeMessage = data.mode === 'fine_tuned' ? i18n_ai.fineTune : i18n_ai.freshTrain;
+            statusDiv.innerHTML = `${i18n_ai.trainingComplete} ${lastLoss}<br>${modeMessage}`;
+        })
+        .catch(error => {
+            console.error('Training request failed:', error);
+            statusDiv.innerHTML = `<strong>⚠️ ${i18n_ai.requestError}</strong>`;
         });
     });
 
     document.getElementById('predict-btn').addEventListener('click', () => {
         const truthPlot = document.getElementById('ground-truth-plot');
         const predPlot = document.getElementById('prediction-plot');
+        const idwPlot = document.getElementById('idw-prediction-plot');
         truthPlot.innerHTML = i18n_ai.predicting;
         predPlot.innerHTML = i18n_ai.predicting;
+        if (idwPlot) idwPlot.innerHTML = i18n_ai.predicting;
 
         fetch('/api/predict_contamination')
         .then(response => response.json())
         .then(data => {
             if (data.error) {
                 alert(data.error);
-                truthPlot.innerHTML = ''; predPlot.innerHTML = '';
+                truthPlot.innerHTML = '';
+                predPlot.innerHTML = '';
+                if (idwPlot) idwPlot.innerHTML = '';
                 return;
             }
             
-            const layout = { autosize: true, xaxis: { scaleratio: 1 }, yaxis: { scaleratio: 1 } };
-            const heatMapData = (zData) => [{ z: zData, type: 'heatmap', colorscale: 'Reds' }];
+            const computeGlobalRange = (matrices) => {
+                let min = Infinity;
+                let max = -Infinity;
+                matrices.forEach(matrix => {
+                    if (!matrix) return;
+                    matrix.forEach(row => {
+                        row.forEach(val => {
+                            if (Number.isFinite(val)) {
+                                if (val < min) min = val;
+                                if (val > max) max = val;
+                            }
+                        });
+                    });
+                });
+                if (!Number.isFinite(min) || !Number.isFinite(max)) {
+                    return { min: 0, max: 1 };
+                }
+                if (min === max) {
+                    return { min, max: min + 1e-6 };
+                }
+                return { min, max };
+            };
 
-            Plotly.newPlot(truthPlot, heatMapData(data.ground_truth), { ...layout, title: i18n_ai.groundTruthTitle });
-            Plotly.newPlot(predPlot, heatMapData(data.prediction), { ...layout, title: i18n_ai.predictionTitle });
+            const { min, max } = computeGlobalRange([
+                data.ground_truth,
+                data.prediction,
+                data.idw_prediction
+            ]);
+
+            const baseLayout = (title) => ({
+                autosize: true,
+                title,
+                margin: { l: 40, r: 40, t: 40, b: 40 },
+                xaxis: { scaleanchor: 'y', constrain: 'domain', title: 'X' },
+                yaxis: { scaleratio: 1, constrain: 'domain', title: 'Y' }
+            });
+
+            const heatMapData = (zData) => [{
+                z: zData,
+                type: 'heatmap',
+                colorscale: 'Reds',
+                zmin: min,
+                zmax: max,
+                showscale: false
+            }];
+
+            try {
+                truthPlot.innerHTML = '';
+                predPlot.innerHTML = '';
+                if (idwPlot) idwPlot.innerHTML = '';
+                const truthPromise = Plotly.newPlot(
+                    truthPlot,
+                    heatMapData(data.ground_truth || []),
+                    baseLayout(i18n_ai.groundTruthTitle)
+                );
+                const predPromise = Plotly.newPlot(
+                    predPlot,
+                    heatMapData(data.prediction || []),
+                    baseLayout(i18n_ai.predictionTitle)
+                );
+                const idwPromise = idwPlot
+                    ? Plotly.newPlot(
+                        idwPlot,
+                        heatMapData(data.idw_prediction || []),
+                        baseLayout(i18n_ai.idwTitle)
+                      )
+                    : Promise.resolve();
+                Promise.all([truthPromise, predPromise, idwPromise]).catch(err => {
+                    console.error('Plotly render error:', err);
+                    alert(i18n_ai.plotError || '플롯 렌더링 중 오류가 발생했습니다.');
+                });
+            } catch (error) {
+                console.error('Prediction render error:', error);
+                alert(i18n_ai.plotError || '플롯 렌더링 중 오류가 발생했습니다.');
+                truthPlot.innerHTML = '';
+                predPlot.innerHTML = '';
+                if (idwPlot) idwPlot.innerHTML = '';
+            }
+        })
+        .catch(err => {
+            console.error('Prediction request failed:', err);
+            alert(i18n_ai.requestError || '예측 요청 중 오류가 발생했습니다.');
+            truthPlot.innerHTML = '';
+            predPlot.innerHTML = '';
+            if (idwPlot) idwPlot.innerHTML = '';
         });
     });
 }

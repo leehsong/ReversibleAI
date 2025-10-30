@@ -26,6 +26,12 @@
             <label for="epochs">{{ _('학습 Epochs:') }}</label>
             <input type="number" id="epochs" value="20" min="5" max="100">
         </div>
+        <div class="control-group">
+            <label>
+                <input type="checkbox" id="reuse-existing" checked>
+                {{ _('기존 모델이 있으면 이어서 학습하기 (권장)') }}
+            </label>
+        </div>
         <button id="start-training-btn">{{ _('모델 학습 시작') }}</button>
     </div>
     <div id="training-status" style="margin-top: 15px;"></div>
@@ -46,6 +52,10 @@
         <h4>{{ _('AI 예측 결과 (Prediction)') }}</h4>
         <div id="prediction-plot"></div>
     </div>
+    <div class="card plot-container half-width">
+        <h4>{{ _('IDW 보간 결과 (Inverse Distance Weighting)') }}</h4>
+        <div id="idw-prediction-plot"></div>
+    </div>
 </div>
 
 <script>
@@ -54,7 +64,12 @@
         trainingComplete: "<strong>✅ {{ _('학습 완료!') }}</strong><br>Final loss:",
         predicting: "{{ _('예측 중...') }}",
         groundTruthTitle: "{{ _('실제 오염 분포') }}",
-        predictionTitle: "{{ _('AI 예측 결과') }}"
+        predictionTitle: "{{ _('AI 예측 결과') }}",
+        idwTitle: "{{ _('IDW 기반 추정 결과') }}",
+        fineTune: "{{ _('✅ 기존 모델을 이어서 학습했습니다.') }}",
+        freshTrain: "{{ _('🆕 새 모델을 처음부터 학습했습니다.') }}",
+        plotError: "{{ _('플롯을 그리는 중 오류가 발생했습니다.') }}",
+        requestError: "{{ _('요청 처리 중 오류가 발생했습니다.') }}"
     };
 </script>
 {% endblock %}

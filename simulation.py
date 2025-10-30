@@ -25,6 +25,23 @@ def run_drone_scan(terrain, contamination, altitude):
     normals = np.dstack((-grad_x, -grad_y, np.ones_like(terrain)))
     norms = np.linalg.norm(normals, axis=2, keepdims=True)
     normalized_normals = normals / norms
+    normalized_normals = np.nan_to_num(normalized_normals, nan=0.0, posinf=0.0, neginf=0.0)
+
+    # 오염원이 있는 지점만 추출하여 연산량 감소
+    source_indices = np.argwhere(contamination > 0.1)
+    source_positions = None
+    source_strength = None
+    source_normals = None
+    if source_indices.size > 0:
+        source_y = source_indices[:, 0]
+        source_x = source_indices[:, 1]
+        source_positions = np.column_stack((
+            source_x.astype(float),
+            source_y.astype(float),
+            terrain[source_y, source_x].astype(float)
+        ))
+        source_strength = contamination[source_y, source_x].astype(float)
+        source_normals = normalized_normals[source_y, source_x, :].astype(float)
 
     drone_path = []
     measured_values = []
@@ -42,25 +59,34 @@ def run_drone_scan(terrain, contamination, altitude):
                 continue
             
             drone_path.append(drone_pos)
-            
-            total_signal = 0
-            # 모든 오염원이 현재 드론 위치에 미치는 영향 계산
-            for sy in range(0, y_size, 2):
-                for sx in range(0, x_size, 2):
-                    if contamination[sy, sx] > 0.1:
-                        source_pos = np.array([sx, sy, terrain[sy, sx]])
-                        
-                        vec_to_drone = drone_pos - source_pos
-                        dist_sq = np.sum(vec_to_drone**2)
 
-                        if dist_sq > 1:
-                            norm_vec_to_drone = vec_to_drone / np.sqrt(dist_sq)
-                            source_normal = normalized_normals[sy, sx]
-                            directionality = max(0, np.dot(source_normal, norm_vec_to_drone))
-                            
-                            signal = (contamination[sy, sx] / dist_sq) * directionality
-                            total_signal += signal
-            
+            if source_positions is None:
+                measured_values.append(0.0)
+                continue
+
+            vec_to_drone = drone_pos.astype(float) - source_positions  # shape (N, 3)
+            dist_sq = np.einsum('ij,ij->i', vec_to_drone, vec_to_drone)
+            valid_mask = dist_sq > 1.0
+
+            if not np.any(valid_mask):
+                measured_values.append(0.0)
+                continue
+
+            vec_to_drone = vec_to_drone[valid_mask]
+            dist_sq = dist_sq[valid_mask]
+            strength = source_strength[valid_mask]
+            normals_subset = source_normals[valid_mask]
+
+            inv_dist = 1.0 / np.sqrt(dist_sq)
+            norm_vec_to_drone = vec_to_drone * inv_dist[:, None]
+            directionality = np.maximum(
+                0.0,
+                np.einsum('ij,ij->i', normals_subset, norm_vec_to_drone)
+            )
+
+            signal = (strength / dist_sq) * directionality
+            total_signal = np.sum(signal)
+
             measured_values.append(total_signal * 100)
             
     return drone_path, np.array(measured_values)
@@ -77,3 +103,52 @@ def format_measurements_for_model(measurements, terrain_shape):
             input_array[int(y), int(x)] = val
 
     return np.expand_dims(input_array, axis=(0, -1))
+
+
+def idw_interpolation(measurements, terrain_shape, power=2.0, smoothing=1e-6, target_scale=None):
+    """
+    드론 측정값을 이용해 IDW(역거리 가중) 방식으로 오염도를 추정합니다.
+    measurements: {'path': [[x, y, z], ...], 'values': [...]}
+    terrain_shape: (height, width)
+    target_scale: 대상 스케일 상한(예: 실제 오염 맵의 최대값). None이면 입력값 그대로 사용.
+    """
+    if not measurements or len(measurements.get('path', [])) == 0:
+        return np.zeros(terrain_shape, dtype=float)
+
+    coords = np.array([[p[0], p[1]] for p in measurements['path']], dtype=float)
+    values = np.array(measurements['values'], dtype=float)
+
+    # 유효한 값 필터링
+    valid_mask = np.isfinite(values)
+    coords = coords[valid_mask]
+    values = values[valid_mask]
+
+    if coords.size == 0:
+        return np.zeros(terrain_shape, dtype=float)
+
+    # 측정값을 목표 스케일에 맞춰 정규화 (예: Ground Truth 최대값에 맞춤)
+    if target_scale is not None:
+        max_val = np.max(np.abs(values))
+        if max_val > 0:
+            values = values * (target_scale / max_val)
+
+    grid_y, grid_x = np.indices(terrain_shape, dtype=float)
+    idw_accumulator = np.zeros(terrain_shape, dtype=float)
+    weight_sum = np.zeros(terrain_shape, dtype=float)
+
+    for (x, y), value in zip(coords, values):
+        dist_sq = (grid_x - x) ** 2 + (grid_y - y) ** 2
+        weights = 1.0 / np.power(dist_sq + smoothing, power / 2.0)
+        idw_accumulator += weights * value
+        weight_sum += weights
+
+    with np.errstate(divide='ignore', invalid='ignore'):
+        interpolated = np.where(weight_sum > 0, idw_accumulator / weight_sum, 0.0)
+
+    # IDW는 측정 지점에서 정확한 값을 갖도록 보정
+    for (x, y), value in zip(coords, values):
+        xi, yi = int(round(x)), int(round(y))
+        if 0 <= yi < terrain_shape[0] and 0 <= xi < terrain_shape[1]:
+            interpolated[yi, xi] = value
+
+    return interpolated

@@ -1,0 +1,19 @@
+version: "3.8"
+
+services:
+  reversibleai:
+    build: .
+    container_name: reversibleai
+    ports:
+      - "30000:30000"           # 외부 30000 → 내부 30000
+    environment:
+      - FLASK_ENV=production
+      - PORT=30000
+      - BABEL_DEFAULT_LOCALE=ko
+      - BABEL_DEFAULT_TIMEZONE=Asia/Seoul
+      - SESSION_TYPE=filesystem
+      - SESSION_FILE_DIR=/tmp/sessions
+    volumes:
+      - .:/app
+      - ./session_data:/tmp/sessions   # 세션 파일 지속 보관
+    restart: always

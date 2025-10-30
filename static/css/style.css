@@ -209,12 +209,22 @@ button:hover {
 .prediction-results {
     display: flex;
     gap: 20px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    align-items: stretch;
 }
 
 .half-width {
-    flex: 1;
-    min-width: 400px;
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+@media (max-width: 1100px) {
+    .prediction-results {
+        flex-wrap: wrap;
+    }
+    .half-width {
+        min-width: 320px;
+    }
 }
 
 .warning {

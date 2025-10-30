@@ -7,6 +7,12 @@
         {{ _('아래 <strong>3D 지형 지도</strong> 위 원하는 위치를 <strong>클릭</strong>하여 오염원을 추가하세요.') }}<br>
         {{ _('클릭하면 해당 위치의 지형 색상이 실시간으로 붉게 변합니다.') }}
     </p>
+    <div class="controls" style="margin-top: 15px;">
+        <button id="random-contaminants-btn">{{ _('랜덤 오염원 생성') }}</button>
+    </div>
+    <p class="note">
+        {{ _('버튼을 누르면 지도 전체에 1~20개의 가우시안 오염원이 무작위로 배치됩니다.') }}
+    </p>
 </div>
 
 <div class="card plot-container">
@@ -21,7 +27,8 @@
     // Pass translated text to JavaScript
     const i18n = {
         plotTitle: "{{ _('3D 지도 위를 클릭하여 오염원 추가') }}",
-        colorbarTitle: "{{ _('오염도') }}"
+        colorbarTitle: "{{ _('오염도') }}",
+        randomError: "{{ _('랜덤 오염원을 생성하는 도중 문제가 발생했습니다.') }}"
     };
 </script>
 {% endblock %}
