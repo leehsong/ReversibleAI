@@ -21,7 +21,7 @@ Session(app)
 # --- 세션 설정 완료 ---
 
 # --- 다국어(Babel) 설정 ---
-app.config['LANGUAGES'] = {'en': 'English', 'ko': 'Korean'}
+app.config['LANGUAGES'] = {'en': 'English', 'ja': 'Japanese', 'ko': 'Korean'}
 app.config['BABEL_DEFAULT_LOCALE'] = 'ko'
 
 def get_locale():

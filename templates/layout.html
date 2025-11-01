@@ -15,7 +15,8 @@
                 <div class="controls-right">
                     <div class="language-selector">
                         <a href="{{ url_for(request.endpoint, lang_code='ko') }}">🇰🇷 Korean</a> | 
-                        <a href="{{ url_for(request.endpoint, lang_code='en') }}">🇬🇧 English</a>
+                        <a href="{{ url_for(request.endpoint, lang_code='en') }}">🇬🇧 English</a> | 
+                        <a href="{{ url_for(request.endpoint, lang_code='ja') }}">🇯🇵 Japanese</a>
                     </div>
                     {% if session.username %}
                         <div class="user-info">
